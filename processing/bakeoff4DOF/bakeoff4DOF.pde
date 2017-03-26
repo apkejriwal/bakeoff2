@@ -3,11 +3,13 @@ import java.util.Collections;
 
 int index = 0;
 
-//your input code should modify these!!
-float screenTransX = 0;
-float screenTransY = 0;
-float screenRotation = 0;
-float screenZ = 50f;
+float maxZ = 216f;
+float screenTransX = 0; // change in X
+float screenTransY = 0; // change in Y
+float screenRotation = 0; // change in rotation
+//float targettingZStart = 50f; // starting size of targetting square
+float targettingZStart = maxZ; // starting size of targetting square
+float screenZ = 0; //change in size
 
 int trialCount = 8; //this will be set higher for the bakeoff
 float border = 0; //have some padding from the sides
@@ -75,30 +77,34 @@ void draw() {
     return;
   }
 
-  //===========DRAW TARGET SQUARE=================
+  //===========DRAW TARGET SQUARE (red)=================
   pushMatrix();
   translate(width/2, height/2); //center the drawing coordinates to the center of the screen
 
   Target t = targets.get(trialIndex);
 
+  
   translate(t.x, t.y); //center the drawing coordinates to the center of the screen
   translate(screenTransX, screenTransY); //center the drawing coordinates to the center of the screen
+  
 
+  // rotation for target square
   rotate(radians(t.rotation));
+  rotate(radians(screenRotation));
 
   fill(255, 0, 0); //set color to semi translucent
-  rect(0, 0, t.z, t.z);
+  rect(0, 0, t.z + screenZ, t.z + screenZ);
 
   popMatrix();
 
-  //===========DRAW TARGETTING SQUARE=================
+  //===========DRAW TARGETTING SQUARE (gray) =================
   pushMatrix();
   translate(width/2, height/2); //center the drawing coordinates to the center of the screen
-  rotate(radians(screenRotation));
+  rotate(radians(0)); // targetting square has 0 degree rotation and cannot change
   //custom shifts:
   //translate(screenTransX,screenTransY); //center the drawing coordinates to the center of the screen
   fill(255, 128); //set color to semi translucent
-  rect(0, 0, screenZ, screenZ);
+  rect(0, 0, targettingZStart, targettingZStart); //set size of targetting square (doesn't change)
   popMatrix();
 
   scaffoldControlLogic(); //you are going to want to replace this!
