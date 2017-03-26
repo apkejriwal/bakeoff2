@@ -143,15 +143,6 @@ void draw() {
   text("X/Y Positioning: " + checkDistance() , width/2, inchesToPixels(.5f));
   
   
-  if(checkZ()){
-    fill(0, 255, 0);
-  }else{
-    fill(255, 0, 0);
-  }
-  text("Size: " + checkZ() , width/2, inchesToPixels(1f));
-  
-
-  
   if(checkRotation()){
     fill(0, 255, 0);
   }else{
@@ -159,7 +150,23 @@ void draw() {
   }
   text("Rotation: " + checkRotation() , width/2, inchesToPixels(.7f));
   
+  //text("t.rotation: " + t.rotation , width/2, inchesToPixels(2f));
+  //text("screenRotation: " + screenRotation , width/2, inchesToPixels(2.5f));
+  //text("t.rotation + screenRotation: " + t.rotation + screenRotation , width/2, inchesToPixels(3f));
+  //float totalRotation = t.rotation + screenRotation ;
+  //text("t.rotation + screenRotation: " + totalRotation, width/2, inchesToPixels(3.5f));
+  
+  
+  if(checkZ()){
+    fill(0, 255, 0);
+  }else{
+    fill(255, 0, 0);
+  }
+  text("Size: " + checkZ() , width/2, inchesToPixels(1f));
+  
+  
 
+  
   
   
   
@@ -334,14 +341,17 @@ public boolean checkDistance()
 public boolean checkRotation()
 {
   Target t = targets.get(trialIndex);  
-  boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation,screenRotation)<=5;
+  //boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation,screenRotation)<=5;
+  // TODO: check if it is alright to slightly change this code to check angle (bcz of screenRotation use for red instead of gray rect)
+  boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation + screenRotation, 0)<=5;
   return closeRotation;
 }
 
 public boolean checkZ()
 {
   Target t = targets.get(trialIndex);  
-  boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f);
+  //boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f);
+  boolean closeZ = abs((t.z + screenZ) - targettingZStart)<inchesToPixels(.05f);
   return closeZ;
 }
 
