@@ -148,13 +148,13 @@ void draw() {
   }else{
     fill(255, 0, 0);
   }
-  text("Rotation: " + checkRotation() , width/2, inchesToPixels(.7f));
+  text("Rotation: " + checkRotation() , 150 + inchesToPixels(.2f), inchesToPixels(.4f));
   
   //text("t.rotation: " + t.rotation , width/2, inchesToPixels(2f));
-  //text("screenRotation: " + screenRotation , width/2, inchesToPixels(2.5f));
-  //text("t.rotation + screenRotation: " + t.rotation + screenRotation , width/2, inchesToPixels(3f));
+  //text("screenRotation: " + screenRotation , width/2, inchesToPixels(2.25f));
+  //text("t.rotation + screenRotation: " + t.rotation + screenRotation , width/2, inchesToPixels(2.5f));
   //float totalRotation = t.rotation + screenRotation ;
-  //text("t.rotation + screenRotation: " + totalRotation, width/2, inchesToPixels(3.5f));
+  //text("t.rotation + screenRotation: " + totalRotation, width/2, inchesToPixels(2.75f));
   
   
   if(checkZ()){
@@ -162,9 +162,12 @@ void draw() {
   }else{
     fill(255, 0, 0);
   }
-  text("Size: " + checkZ() , width/2, inchesToPixels(1f));
+  text("Size: " + checkZ() , 150 + inchesToPixels(.2f), inchesToPixels(1f));
   
   
+  //float redSquaresize = t.z + screenZ;
+  //text("Red Square size: " + redSquaresize,  width/2, inchesToPixels(3.25f));
+  //text("Gray Square Size: " + targettingZStart , width/2, inchesToPixels(3.5f));
 
   
   
@@ -176,8 +179,8 @@ void draw() {
 void scaffoldControlLogic()
 {
   //upper left corner, rotate counterclockwise
-  float CCWX = inchesToPixels(.2f);
-  float CCWY = inchesToPixels(.2f);
+  float CCWX = 10 + inchesToPixels(.2f);
+  float CCWY = inchesToPixels(.4f);
   float CCWRegion = inchesToPixels(.25f); 
   fill(0, 0, 0);
   ellipse(CCWX, CCWY, CCWRegion*2, CCWRegion*2);
@@ -187,8 +190,8 @@ void scaffoldControlLogic()
     screenRotation--;
 
   //upper right corner, rotate clockwise
-  float CWX = 50 + inchesToPixels(.2f);
-  float CWY = inchesToPixels(.2f);
+  float CWX = 60 + inchesToPixels(.2f);
+  float CWY = inchesToPixels(.4f);
   float CWRegion = inchesToPixels(.25f); 
   fill(0, 0, 0);
   ellipse(CWX, CWY, CWRegion*2, CWRegion*2);
@@ -198,8 +201,8 @@ void scaffoldControlLogic()
     screenRotation++;
 
   //lower left corner, decrease Z
-  float minusX = inchesToPixels(.2f);
-  float minusY = height-inchesToPixels(.2f);
+  float minusX = 10 + inchesToPixels(.2f);
+  float minusY = inchesToPixels(1f);
   float minusRegion = inchesToPixels(.25f); 
   fill(0, 0, 0);
   ellipse(minusX, minusY, minusRegion*2, minusRegion*2);
@@ -209,8 +212,8 @@ void scaffoldControlLogic()
     screenZ-=inchesToPixels(.02f);
 
   //lower right corner, increase Z
-  float plusX =  50 + inchesToPixels(.2f);
-  float plusY = height-inchesToPixels(.2f);
+  float plusX =  60 + inchesToPixels(.2f);
+  float plusY = inchesToPixels(1f);
   float plusRegion = inchesToPixels(.25f); 
   fill(0, 0, 0);
   ellipse(plusX, plusY, plusRegion*2, plusRegion*2);
@@ -358,9 +361,13 @@ public boolean checkZ()
 public boolean checkForSuccess()
 {
 	Target t = targets.get(trialIndex);	
-	boolean closeDist = dist(t.x,t.y,-screenTransX,-screenTransY)<inchesToPixels(.05f); //has to be within .1"
-  boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation,screenRotation)<=5;
-	boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f); //has to be within .1"	
+	//boolean closeDist = dist(t.x,t.y,-screenTransX,-screenTransY)<inchesToPixels(.05f); //has to be within .1"
+  //boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation,screenRotation)<=5;
+	//boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f); //has to be within .1"	
+
+  boolean closeDist = checkDistance();
+  boolean closeRotation = checkRotation();
+  boolean closeZ = checkZ();
 	
   println("Close Enough Distance: " + closeDist);
   println("Close Enough Rotation: " + closeRotation + "(dist="+calculateDifferenceBetweenAngles(t.rotation,screenRotation)+")");
