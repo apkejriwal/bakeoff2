@@ -1,6 +1,14 @@
 import java.util.ArrayList;
 import java.util.Collections;
 
+int value = 0; // test variable
+boolean draggingSquare = false;
+// nextButton variables are redfined in setup()
+float nextButtonX = 0;
+float nextButtonY = 0;
+
+
+
 int index = 0;
 
 float maxZ = 216f;
@@ -38,11 +46,15 @@ float inchesToPixels(float inch)
 }
 
 void setup() {
-  size(800,800); 
+  size(800,800);
+  nextButtonX = 3*width/4;
+  nextButtonY = height-inchesToPixels(.2f);
 
   rectMode(CENTER);
   textFont(createFont("Arial", inchesToPixels(.2f))); //sets the font to Arial that is .3" tall
   textAlign(CENTER);
+  ellipseMode(CENTER);
+
 
   //don't change this! 
   border = inchesToPixels(.2f); //padding of 0.2 inches
@@ -65,8 +77,17 @@ void setup() {
 void draw() {
 
   background(60); //background is dark grey
+  
+  //testing dragging
+  fill(value);
+  rect(25, 25, 50, 50);
+  // end test
+  
+  
   fill(200);
   noStroke();
+  
+
 
   if (userDone)
   {
@@ -95,6 +116,8 @@ void draw() {
   fill(255, 0, 0); //set color to semi translucent
   rect(0, 0, t.z + screenZ, t.z + screenZ);
 
+
+
   popMatrix();
 
   //===========DRAW TARGETTING SQUARE (gray) =================
@@ -105,6 +128,12 @@ void draw() {
   //translate(screenTransX,screenTransY); //center the drawing coordinates to the center of the screen
   fill(255, 128); //set color to semi translucent
   rect(0, 0, targettingZStart, targettingZStart); //set size of targetting square (doesn't change)
+  
+  fill(0, 0, 255);
+  ellipse(0, 0, 20, 20);
+  //line(0, 0, width/2, height/2);
+  fill(0, 255, 0);
+  ellipse(t.x + screenTransX, t.y + screenTransY, 10, 10);
   popMatrix();
 
   scaffoldControlLogic(); //you are going to want to replace this!
@@ -149,10 +178,38 @@ void scaffoldControlLogic()
     screenTransY-=inchesToPixels(.02f);
   
   text("down", width/2, height-inchesToPixels(.2f));
-  if (mousePressed && dist(width/2, height, mouseX, mouseY)<inchesToPixels(.5f))
+  if (mousePressed && dist(width/2, height, mouseX, mouseY)<inchesToPixels(.5f)){
     screenTransY+=inchesToPixels(.02f);
+  }
+  
+  text("Next", nextButtonX, nextButtonY);
+  //text("Next", 3*width/4, height-inchesToPixels(.2f));
+  println("3*width/4 : " + 3*width/4 + " height-inchesToPixels(.2f): " + Float.toString(height-inchesToPixels(.2f)));
+  println("nextButtonX : " + nextButtonX + " nextButtonY: " + nextButtonY);
+  
+    
+  
 }
 
+void mouseDragged()
+{
+  value = value + 5;
+  if (value > 255) {
+    value = 0;
+  }
+  
+  Target t = targets.get(trialIndex);
+  fill(0, 255, 0);
+  if (dist(width/2 + t.x + screenTransX, height/2 + t.y + screenTransY, mouseX, mouseY)<inchesToPixels(.5f)){
+    ellipse(width/2, height/2, 20,20);
+    // adjust change in X and Y to drag red target square
+    //screenTransX = mouseX - t.x - width/2;
+    //screenTransY = mouseY - t.y - height/2;
+    println("MouseX : " + mouseX + " MouseY: " + mouseY);
+    println("Width/2 : " + width/2 + " height/2: " + height/2);
+    
+  }  
+}
 
 void mousePressed()
 {
@@ -161,13 +218,29 @@ void mousePressed()
       startTime = millis();
       println("time started!");
     }
+    
+    println("MOUSE PRESSED!!!!! : ");
+    
+    Target t = targets.get(trialIndex);
+    if (dist(width/2 + t.x + screenTransX, height/2 + t.y + screenTransY, mouseX, mouseY)<inchesToPixels(.5f)){
+      draggingSquare = true;
+  } 
+    
+    
 }
 
 
 void mouseReleased()
 {
+  
+  if (draggingSquare){
+    draggingSquare = false;
+    Target t = targets.get(trialIndex);
+    screenTransX = mouseX - t.x - width/2;
+    screenTransY = mouseY - t.y - height/2;
+  }
   //check to see if user clicked middle of screen
-  if (dist(width/2, height/2, mouseX, mouseY)<inchesToPixels(.5f))
+  if (dist(nextButtonX, nextButtonY, mouseX, mouseY)<inchesToPixels(.5f))
   {
     if (userDone==false && !checkForSuccess())
       errorCount++;
