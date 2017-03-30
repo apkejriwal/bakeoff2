@@ -6,8 +6,6 @@ boolean draggingSquare = false;
 float nextButtonX = 0;
 float nextButtonY = 0;
 
-
-
 int index = 0;
 
 float maxZ = 216f;
@@ -45,7 +43,8 @@ float inchesToPixels(float inch)
 }
 
 void setup() {
-  size(800,800);
+
+  size(600,600);
   nextButtonX = 3*width/4;
   nextButtonY = height-inchesToPixels(.2f);
 
@@ -53,7 +52,6 @@ void setup() {
   textFont(createFont("Arial", inchesToPixels(.2f))); //sets the font to Arial that is .3" tall
   textAlign(CENTER);
   ellipseMode(CENTER);
-
 
   //don't change this! 
   border = inchesToPixels(.2f); //padding of 0.2 inches
@@ -76,13 +74,9 @@ void setup() {
 void draw() {
 
   background(60); //background is dark grey
-  
-  
   fill(200);
   noStroke();
   
-
-
   if (userDone)
   {
     text("User completed " + trialCount + " trials", width/2, inchesToPixels(.2f));
@@ -97,11 +91,9 @@ void draw() {
   translate(width/2, height/2); //center the drawing coordinates to the center of the screen
 
   Target t = targets.get(trialIndex);
-
   
   translate(t.x, t.y); //center the drawing coordinates to the center of the screen
   translate(screenTransX, screenTransY); //center the drawing coordinates to the center of the screen
-  
 
   // rotation for target square
   rotate(radians(t.rotation));
@@ -109,8 +101,6 @@ void draw() {
 
   fill(255, 0, 0); //set color to semi translucent
   rect(0, 0, t.z + screenZ, t.z + screenZ);
-
-
 
   popMatrix();
 
@@ -150,27 +140,12 @@ void draw() {
   }
   text("Rotation: " + checkRotation() , 150 + inchesToPixels(.2f), inchesToPixels(.4f));
   
-  //text("t.rotation: " + t.rotation , width/2, inchesToPixels(2f));
-  //text("screenRotation: " + screenRotation , width/2, inchesToPixels(2.25f));
-  //text("t.rotation + screenRotation: " + t.rotation + screenRotation , width/2, inchesToPixels(2.5f));
-  //float totalRotation = t.rotation + screenRotation ;
-  //text("t.rotation + screenRotation: " + totalRotation, width/2, inchesToPixels(2.75f));
-  
-  
   if(checkZ()){
     fill(0, 255, 0);
   }else{
     fill(255, 0, 0);
   }
   text("Size: " + checkZ() , 150 + inchesToPixels(.2f), inchesToPixels(1f));
-  
-  
-  //float redSquaresize = t.z + screenZ;
-  //text("Red Square size: " + redSquaresize,  width/2, inchesToPixels(3.25f));
-  //text("Gray Square Size: " + targettingZStart , width/2, inchesToPixels(3.5f));
-
-  
-  
   
   
 }
@@ -275,8 +250,11 @@ void mouseDragged()
   
   // if dragging square in motion, adjust target square to follow mouse #dragging
   if (draggingSquare){
-    screenTransX = mouseX - t.x - width/2;
-    screenTransY = mouseY - t.y - height/2;
+    // screenTransX = mouseX - t.x - width/2;
+    // screenTransY = mouseY - t.y - height/2;
+
+    screenTransX = mouseX - t.x - width;
+    screenTransY = mouseY - t.y - height;
   }
   
   
@@ -360,20 +338,20 @@ public boolean checkZ()
 
 public boolean checkForSuccess()
 {
-	Target t = targets.get(trialIndex);	
-	//boolean closeDist = dist(t.x,t.y,-screenTransX,-screenTransY)<inchesToPixels(.05f); //has to be within .1"
+  Target t = targets.get(trialIndex);  
+  //boolean closeDist = dist(t.x,t.y,-screenTransX,-screenTransY)<inchesToPixels(.05f); //has to be within .1"
   //boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation,screenRotation)<=5;
-	//boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f); //has to be within .1"	
+  //boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f); //has to be within .1"  
 
   boolean closeDist = checkDistance();
   boolean closeRotation = checkRotation();
   boolean closeZ = checkZ();
-	
+  
   println("Close Enough Distance: " + closeDist);
   println("Close Enough Rotation: " + closeRotation + "(dist="+calculateDifferenceBetweenAngles(t.rotation,screenRotation)+")");
-	println("Close Enough Z: " + closeZ);
-	
-	return closeDist && closeRotation && closeZ;	
+  println("Close Enough Z: " + closeZ);
+  
+  return closeDist && closeRotation && closeZ;  
 }
 
 
