@@ -37,6 +37,13 @@ int ball_x = 0;
 int ball_y = 0;
 int ball_size = 18;
 
+int final_ball_x = 0;
+int final_ball_y = 0; 
+int final_size = 18;
+
+float value = 0; 
+float posValue = 0; 
+
 
 final int screenPPI = 72; //what is the DPI of the screen you are using 
 
@@ -56,7 +63,7 @@ float inchesToPixels(float inch)
 }
 
 void setup() {
-  size(600, 600);
+  size(700, 700);
   noStroke();
 
   ball_x = 430; 
@@ -100,8 +107,8 @@ void draw() {
 
   noStroke();
 
+  fill(0,255,0);
   ellipse(ball_x,ball_y,ball_size,ball_size);
-  fill(0,0,255);
 
 
 if (userDone)
@@ -147,6 +154,42 @@ if (userDone)
   fill(0, 255, 0);
   ellipse(t.x + screenTransX, t.y + screenTransY, inchesToPixels(.05f)*2, inchesToPixels(.05f)*2);
   popMatrix();
+
+  // target ellipse slider 
+
+
+
+  
+  if (t.z < maxZ)
+  {
+    value = abs(maxZ - t.z);
+
+    // 1.44 == (216f / 150) 
+    // 150 == size of y bound (0 - 150)
+     posValue = value * (1.44);
+  }
+
+  // need to account for the condition where t.z > maxZ
+  // i.e target square is bigger than the gray square 
+
+  // if (t.z > maxZ)
+  // ... 
+  // ...
+
+
+  // 430 is starting x spot of 
+  final_ball_x = int(430 + ((90 - (t.rotation % 90)) * (150.0 / 90)));
+  final_ball_y = 160 - int(posValue);
+
+    // 1.44 == (216f / 150) 
+    // 150 == size of y bound (0 - 150)
+
+  screenZ = ((160 - ball_y)*(1.44)) % maxZ;
+
+  fill(0, 255, 0);
+  ellipse(final_ball_x, final_ball_y, final_size, final_size);
+
+  // finish target ellipse slider 
 
   scaffoldControlLogic(); //you are going to want to replace this!
   
@@ -263,6 +306,12 @@ void mouseReleased()
 
     //and move on to next trial
     trialIndex++;
+    ball_x = 430;
+    ball_y = 160;
+    value = 0;
+    posValue = 0;
+
+
     // hs1.reset();
     // hs2.reset();
 
