@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Collections;
 
+HScrollbar hs1, hs2;  // Two scrollbars
+
 boolean draggingSquare = false;
 // nextButton variables are redfined in setup()
 float nextButtonX = 0;
@@ -43,8 +45,16 @@ float inchesToPixels(float inch)
 }
 
 void setup() {
-
-  size(600,600);
+  size(600, 600);
+  noStroke();
+  
+  hs1 = new HScrollbar(width/2, 2.5 * height/32, 3*(width/4), 16, 16);
+  hs2 = new HScrollbar(width/2, height/32, 3*(width/4), 16, 16);  
+  
+  // Load images
+  //img1 = loadImage("seedTop.jpg");
+  //img2 = loadImage("seedBottom.jpg");
+  
   nextButtonX = 3*width/4;
   nextButtonY = height-inchesToPixels(.2f);
 
@@ -72,12 +82,15 @@ void setup() {
 }
 
 void draw() {
-
-  background(60); //background is dark grey
-  fill(200);
-  noStroke();
   
-  if (userDone)
+  background(128);
+  
+  hs1.update();
+  hs2.update();
+  hs1.display();
+  hs2.display();
+
+if (userDone)
   {
     text("User completed " + trialCount + " trials", width/2, inchesToPixels(.2f));
     text("User had " + errorCount + " error(s)", width/2, inchesToPixels(.2f)*2);
@@ -130,7 +143,7 @@ void draw() {
   }else{
     fill(255, 0, 0);
   }
-  text("X/Y Positioning: " + checkDistance() , width/2, inchesToPixels(.5f));
+  text("X/Y Positioning: " + checkDistance() , 150, inchesToPixels(7.75f));
   
   
   if(checkRotation()){
@@ -138,14 +151,15 @@ void draw() {
   }else{
     fill(255, 0, 0);
   }
-  text("Rotation: " + checkRotation() , 150 + inchesToPixels(.2f), inchesToPixels(.4f));
+
+  text("Rotation: " + checkRotation() , 150 + inchesToPixels(.2f), inchesToPixels(7.5f));
   
   if(checkZ()){
     fill(0, 255, 0);
   }else{
     fill(255, 0, 0);
   }
-  text("Size: " + checkZ() , 150 + inchesToPixels(.2f), inchesToPixels(1f));
+  text("Size: " + checkZ() , 150 + inchesToPixels(.2f), inchesToPixels(8f));
   
   
 }
@@ -153,92 +167,7 @@ void draw() {
 //my example design
 void scaffoldControlLogic()
 {
-  //upper left corner, rotate counterclockwise
-  float CCWX = 10 + inchesToPixels(.2f);
-  float CCWY = inchesToPixels(.4f);
-  float CCWRegion = inchesToPixels(.25f); 
-  fill(0, 0, 0);
-  ellipse(CCWX, CCWY, CCWRegion*2, CCWRegion*2);
-  fill(0, 255, 0);
-  text("CCW", CCWX, CCWY);
-  if (mousePressed && dist(CCWX, CCWY, mouseX, mouseY)<CCWRegion)
-    screenRotation--;
 
-  //upper right corner, rotate clockwise
-  float CWX = 60 + inchesToPixels(.2f);
-  float CWY = inchesToPixels(.4f);
-  float CWRegion = inchesToPixels(.25f); 
-  fill(0, 0, 0);
-  ellipse(CWX, CWY, CWRegion*2, CWRegion*2);
-  fill(0, 255, 0);
-  text("CW", CWX, CWY);
-  if (mousePressed && dist(CWX, CWY, mouseX, mouseY)<CWRegion)
-    screenRotation++;
-
-  //lower left corner, decrease Z
-  float minusX = 10 + inchesToPixels(.2f);
-  float minusY = inchesToPixels(1f);
-  float minusRegion = inchesToPixels(.25f); 
-  fill(0, 0, 0);
-  ellipse(minusX, minusY, minusRegion*2, minusRegion*2);
-  fill(0, 255, 0);
-  text("-", minusX, minusY);
-  if (mousePressed && dist(minusX, minusY, mouseX, mouseY)<minusRegion)
-    screenZ-=inchesToPixels(.02f);
-
-  //lower right corner, increase Z
-  float plusX =  60 + inchesToPixels(.2f);
-  float plusY = inchesToPixels(1f);
-  float plusRegion = inchesToPixels(.25f); 
-  fill(0, 0, 0);
-  ellipse(plusX, plusY, plusRegion*2, plusRegion*2);
-  fill(0, 255, 0);
-  text("+", plusX, plusY);
-  if (mousePressed && dist(plusX, plusY, mouseX, mouseY)<plusRegion)
-    screenZ+=inchesToPixels(.02f);
-
-  //left middle, move left
-  float leftX = width-6*inchesToPixels(.2f);
-  float leftY = inchesToPixels(0.75f);
-  float leftRegion = inchesToPixels(.25f); 
-  fill(0, 0, 0);
-  ellipse(leftX, leftY, leftRegion*2, leftRegion*2);
-  fill(0, 255, 0);
-  text("left", leftX, leftY);
-  if (mousePressed && dist(leftX, leftY, mouseX, mouseY)<leftRegion)
-    screenTransX-=inchesToPixels(.02f);
-
-  float rightX = width-inchesToPixels(.2f);
-  float rightY = inchesToPixels(0.75f);
-  float rightRegion = inchesToPixels(.25f); 
-  fill(0, 0, 0);
-  ellipse(rightX, rightY, rightRegion*2, rightRegion*2);
-  fill(0, 255, 0);
-  text("right", rightX, rightY);
-  if (mousePressed && dist(rightX, rightY, mouseX, mouseY)<rightRegion)
-    screenTransX+=inchesToPixels(.02f);
-  
-  float upX = width-3.5*inchesToPixels(.2f);
-  float upY = inchesToPixels(.2f);
-  float upRegion = inchesToPixels(.25f); 
-  fill(0, 0, 0);
-  ellipse(upX, upY, upRegion*2, upRegion*2);
-  fill(0, 255, 0);
-  text("up", upX, upY);
-  if (mousePressed && dist(upX, upY, mouseX, mouseY)<upRegion)
-    screenTransY-=inchesToPixels(.02f);
-  
-  float downX = width-3.5*inchesToPixels(.2f);
-  float downY = inchesToPixels(1.2f);
-  float downRegion = inchesToPixels(.25f); 
-  fill(0, 0, 0);
-  ellipse(downX,downY, downRegion*2, downRegion*2);
-  fill(0, 255, 0);
-  text("down", downX, downY);
-  if (mousePressed && dist(downX, downY, mouseX, mouseY)<downRegion){
-    screenTransY+=inchesToPixels(.02f);
-  }
-  
   text("Next", nextButtonX, nextButtonY);
   
 }
@@ -250,11 +179,8 @@ void mouseDragged()
   
   // if dragging square in motion, adjust target square to follow mouse #dragging
   if (draggingSquare){
-    // screenTransX = mouseX - t.x - width/2;
-    // screenTransY = mouseY - t.y - height/2;
-
-    screenTransX = mouseX - t.x - width;
-    screenTransY = mouseY - t.y - height;
+    screenTransX = mouseX - t.x - width/2;
+    screenTransY = mouseY - t.y - height/2;
   }
   
   
@@ -298,6 +224,8 @@ void mouseReleased()
 
     //and move on to next trial
     trialIndex++;
+    hs1.reset();
+    hs2.reset();
 
     screenTransX = 0;
     screenTransY = 0;
@@ -364,3 +292,115 @@ double calculateDifferenceBetweenAngles(float a1, float a2)
       else
         return diff;
  }
+ 
+ 
+class HScrollbar {
+  int swidth, sheight;    // width and height of bar
+  float xpos, ypos;       // x and y position of bar
+  float spos, newspos;    // x position of slider
+  float sposMin, sposMax; // max and min values of slider
+  int loose;              // how loose/heavy
+  boolean over;           // is the mouse over the slider?
+  boolean locked;
+  float ratio;
+
+  HScrollbar (float xp, float yp, int sw, int sh, int l) {
+    
+    swidth = sw;
+    sheight = sh;
+    
+    int widthtoheight = sw - sh;
+    ratio = (float)sw / (float)widthtoheight;
+    
+    xpos = xp;
+    ypos = yp-sheight/2;
+    
+    spos = xpos - (sw/2);
+    newspos = spos;
+        
+    sposMin = xpos - (sw/2);
+    sposMax = xpos+swidth/2;
+    loose = l;
+   
+  }
+
+  void update() {
+
+    Target t = targets.get(trialIndex);
+
+    if (overEvent()) {
+      over = true;
+    } else {
+      over = false;
+    }
+    if (mousePressed && over) {
+      locked = true;
+    }
+    if (!mousePressed) {
+      locked = false;
+    }
+    if (locked) {
+      newspos = constrain(mouseX-sheight/2, sposMin, sposMax);
+      screenZ += inchesToPixels(.02f);
+    }
+    if (abs(newspos - spos) > 1) {
+      spos = spos + (newspos-spos)/loose;
+    }
+    
+    screenRotation = (hs2.spos - ((xpos - (swidth/2)) * .3));
+
+    float slider_pos = hs1.spos - (xpos - (swidth/2));
+
+    float temp_ratio = (abs(maxZ - t.z) / swidth);
+
+    float temp = (hs1.spos - ((xpos - (swidth/2)) * (108f / swidth)));
+    float temp2 = (hs1.spos - ((xpos - (swidth/2)) * .02f));
+
+
+    float temp3 = slider_pos * temp_ratio;
+
+    screenZ = inchesToPixels(temp3);
+    screenZ %= 350;
+
+  }
+
+  void reset() 
+  {
+    spos = xpos - (swidth/2);
+    newspos = spos;
+  }
+
+  float constrain(float val, float minv, float maxv) {
+    return min(max(val, minv), maxv);
+  }
+
+  boolean overEvent() {
+    if (mouseX > xpos - (swidth/2) && mouseX < xpos+swidth/2 &&
+       mouseY > ypos && mouseY < ypos+sheight) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void display() {
+    
+    noStroke();
+    fill(204);
+    rect(xpos, ypos, swidth, sheight);
+    
+    if (over || locked) {
+      fill(0, 0, 0);
+    } else {
+      fill(102, 102, 102);
+    }
+    
+    rect(spos, ypos, sheight, sheight);
+  }   
+
+  float getPos() {
+    // Convert spos to be values between
+    // 0 and the total width of the scrollbar
+    return spos * ratio;
+  }
+}
