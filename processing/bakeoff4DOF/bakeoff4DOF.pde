@@ -4,6 +4,8 @@ import java.util.Collections;
 HScrollbar hs1, hs2;  // Two scrollbars
 
 boolean draggingSquare = false;
+boolean draggingSlider = false; 
+
 // nextButton variables are redfined in setup()
 float nextButtonX = 0;
 float nextButtonY = 0;
@@ -13,6 +15,10 @@ int index = 0;
 float maxZ = 216f;
 float screenTransX = 0; // change in X
 float screenTransY = 0; // change in Y
+
+float screenTransX2 = 0;
+float screenTransY2 = 0;
+
 float screenRotation = 0; // change in rotation
 //float targettingZStart = 50f; // starting size of targetting square
 float targettingZStart = maxZ; // starting size of targetting square
@@ -26,6 +32,11 @@ float errorPenalty = 0.5f; //for every error, add this to mean time
 int startTime = 0; // time starts when the first click is captured
 int finishTime = 0; //records the time of the final click
 boolean userDone = false;
+
+int ball_x = 0;
+int ball_y = 0;
+int ball_size = 18;
+
 
 final int screenPPI = 72; //what is the DPI of the screen you are using 
 
@@ -47,13 +58,9 @@ float inchesToPixels(float inch)
 void setup() {
   size(600, 600);
   noStroke();
-  
-  hs1 = new HScrollbar(width/2, 2.5 * height/32, 3*(width/4), 16, 16);
-  hs2 = new HScrollbar(width/2, height/32, 3*(width/4), 16, 16);  
-  
-  // Load images
-  //img1 = loadImage("seedTop.jpg");
-  //img2 = loadImage("seedBottom.jpg");
+
+  ball_x = 430; 
+  ball_y = 160;
   
   nextButtonX = 3*width/4;
   nextButtonY = height-inchesToPixels(.2f);
@@ -85,10 +92,17 @@ void draw() {
   
   background(128);
   
-  hs1.update();
-  hs2.update();
-  hs1.display();
-  hs2.display();
+  stroke(255);
+  line(430,10,430,160);
+  stroke(255);
+
+  line(430,160,580,160);
+
+  noStroke();
+
+  ellipse(ball_x,ball_y,ball_size,ball_size);
+  fill(0,0,255);
+
 
 if (userDone)
   {
@@ -182,6 +196,19 @@ void mouseDragged()
     screenTransX = mouseX - t.x - width/2;
     screenTransY = mouseY - t.y - height/2;
   }
+
+  if (draggingSlider){
+    ball_x = mouseX;
+    ball_y = mouseY;
+
+    //rotates the target square accoringly
+    screenRotation = (430 - ball_x) * 1.6666666666666667;
+
+    //adjusts the size accordingly
+    screenZ = ((160 - ball_y)*(1.44)) % 216f;
+
+  
+  }
   
   
 }
@@ -194,15 +221,20 @@ void mousePressed()
       println("time started!");
     }
     
-    println("MOUSE PRESSED!!!!! : ");
     
     Target t = targets.get(trialIndex);
     // check if mouse is near center of target square #dragging
     if (dist(width/2 + t.x + screenTransX, height/2 + t.y + screenTransY, mouseX, mouseY)<inchesToPixels(1f)){
       draggingSquare = true;
-  } 
-    
-    
+
+    } 
+
+
+    if (mouseX >= ball_x - ball_size / 2 && mouseX <= ball_x + ball_size / 2 && (mouseY >= ball_y - ball_size / 2 && mouseY <= ball_y + ball_size / 2))
+    {
+      draggingSlider = true;
+      print(90 - (t.rotation % 90));
+    }
 }
 
 
@@ -215,6 +247,13 @@ void mouseReleased()
     screenTransX = mouseX - t.x - width/2;
     screenTransY = mouseY - t.y - height/2;
   }
+
+  if (draggingSlider){
+    draggingSlider = false;
+    ball_x = mouseX;
+    ball_y = mouseY;
+    
+  }
   
   //check to see if user clicked near Next Button (if so then advance to next random square)
   if (dist(nextButtonX, nextButtonY, mouseX, mouseY)<inchesToPixels(.5f))
@@ -224,11 +263,9 @@ void mouseReleased()
 
     //and move on to next trial
     trialIndex++;
-    hs1.reset();
-    hs2.reset();
+    // hs1.reset();
+    // hs2.reset();
 
-    screenTransX = 0;
-    screenTransY = 0;
 
     if (trialIndex==trialCount && userDone==false)
     {
