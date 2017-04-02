@@ -162,11 +162,12 @@ if (userDone)
   
   if (t.z < maxZ)
   {
-    value = abs(maxZ - t.z);
+    value = maxZ - t.z;
 
     // 1.44 == (216f / 150) 
     // 150 == size of y bound (0 - 150)
-     posValue = value * (1.44);
+     posValue = value / (1.44);
+     print(posValue);
   }
 
   // need to account for the condition where t.z > maxZ
@@ -176,6 +177,7 @@ if (userDone)
   // ... 
   // ...
 
+  screenZ = ((160 - ball_y)*(1.44)) % maxZ;
 
   // 430 is starting x spot of 
   final_ball_x = int(430 + ((90 - (t.rotation % 90)) * (150.0 / 90)));
@@ -184,7 +186,6 @@ if (userDone)
     // 1.44 == (216f / 150) 
     // 150 == size of y bound (0 - 150)
 
-  screenZ = ((160 - ball_y)*(1.44)) % maxZ;
 
   fill(0, 255, 0);
   ellipse(final_ball_x, final_ball_y, final_size, final_size);
