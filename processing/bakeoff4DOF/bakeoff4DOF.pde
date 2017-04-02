@@ -37,8 +37,8 @@ int ball_x = 0;
 int ball_y = 0;
 int ball_size = 18;
 
-int final_ball_x = 0;
-int final_ball_y = 0; 
+float final_ball_x = 0;
+float final_ball_y = 0; 
 int final_size = 18;
 
 float value = 0; 
@@ -101,14 +101,16 @@ void draw() {
   
   stroke(255);
   line(430,10,430,160);
-  stroke(255);
 
+  stroke(255);
   line(430,160,580,160);
 
   noStroke();
 
   fill(0,255,0);
   ellipse(ball_x,ball_y,ball_size,ball_size);
+
+
 
 
 if (userDone)
@@ -155,10 +157,8 @@ if (userDone)
   ellipse(t.x + screenTransX, t.y + screenTransY, inchesToPixels(.05f)*2, inchesToPixels(.05f)*2);
   popMatrix();
 
+
   // target ellipse slider 
-
-
-
   
   if (t.z < maxZ)
   {
@@ -167,7 +167,6 @@ if (userDone)
     // 1.44 == (216f / 150) 
     // 150 == size of y bound (0 - 150)
      posValue = value / (1.44);
-     print(posValue);
   }
 
   // need to account for the condition where t.z > maxZ
@@ -180,7 +179,12 @@ if (userDone)
   screenZ = ((160 - ball_y)*(1.44)) % maxZ;
 
   // 430 is starting x spot of 
-  final_ball_x = int(430 + ((90 - (t.rotation % 90)) * (150.0 / 90)));
+  // final_ball_x = 430 + (90 - (t.rotation % 90) * (1.6666666666666667));
+  final_ball_x = 430 + ((360 - t.rotation)  * (.4166666666666667));
+
+  // final_ball_x = 430 + 
+
+
   final_ball_y = 160 - int(posValue);
 
     // 1.44 == (216f / 150) 
@@ -189,6 +193,16 @@ if (userDone)
 
   fill(0, 255, 0);
   ellipse(final_ball_x, final_ball_y, final_size, final_size);
+
+
+  stroke(255);
+  line(430,final_ball_y,580,final_ball_y);
+
+
+  stroke(255);
+  line(final_ball_x,10,final_ball_x,160);
+
+  noStroke();
 
   // finish target ellipse slider 
 
@@ -248,6 +262,9 @@ void mouseDragged()
     //rotates the target square accoringly
     screenRotation = (430 - ball_x) * 1.6666666666666667;
 
+
+
+
     //adjusts the size accordingly
     screenZ = ((160 - ball_y)*(1.44)) % 216f;
 
@@ -270,9 +287,18 @@ void mousePressed()
     // check if mouse is near center of target square #dragging
     if (dist(width/2 + t.x + screenTransX, height/2 + t.y + screenTransY, mouseX, mouseY)<inchesToPixels(1f)){
       draggingSquare = true;
-
     } 
 
+    
+
+    print("rotation ,");
+    print(t.rotation);
+    println("");
+
+    println("mod 2");
+    println((90 - (t.rotation % 90)));
+    println("final ball val");
+    // println(430 + (90 - (t.rotation % 90) * (.4166666666666667));
 
     if (mouseX >= ball_x - ball_size / 2 && mouseX <= ball_x + ball_size / 2 && (mouseY >= ball_y - ball_size / 2 && mouseY <= ball_y + ball_size / 2))
     {
@@ -330,7 +356,7 @@ void mouseReleased()
 public boolean checkDistance()
 {
   Target t = targets.get(trialIndex);  
-  boolean closeDist = dist(t.x,t.y,-screenTransX,-screenTransY)<inchesToPixels(.05f); //has to be within .1"
+  boolean closeDist = dist(t.x,t.y,-screenTransX,-screenTransY)<inchesToPixels(.1f); //has to be within .1"
   return closeDist;
 }
 
