@@ -1,8 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
 
-HScrollbar hs1, hs2;  // Two scrollbars
-
 boolean draggingSquare = false;
 boolean draggingSlider = false; 
 
@@ -24,7 +22,8 @@ float screenRotation = 0; // change in rotation
 float targettingZStart = maxZ; // starting size of targetting square
 float screenZ = 0; //change in size
 
-int trialCount = 8; //this will be set higher for the bakeoff
+//int trialCount = 8; //this will be set higher for the bakeoff
+int trialCount = 50; //this will be set higher for the bakeoff
 float border = 0; //have some padding from the sides
 int trialIndex = 0; //what trial are we on
 int errorCount = 0;  //used to keep track of errors
@@ -33,17 +32,17 @@ int startTime = 0; // time starts when the first click is captured
 int finishTime = 0; //records the time of the final click
 boolean userDone = false;
 
-int ball_x = 0;
-int ball_y = 0;
-int ball_size = 18;
+float ball_x = 0;
+float ball_y = 0;
+float ball_size = 18;
 
 float final_ball_x = 0;
 float final_ball_y = 0; 
 int final_size = 18;
-
-float value = 0; 
-float posValue = 0; 
-
+float start_grid_y;
+float start_grid_x;
+float grid_height;
+float grid_width;
 
 final int screenPPI = 72; //what is the DPI of the screen you are using 
 
@@ -65,9 +64,17 @@ float inchesToPixels(float inch)
 void setup() {
   size(700, 700);
   noStroke();
+  
+  start_grid_y = height - 50;
+  start_grid_x = 50;
+  grid_height = maxZ;
+  grid_width = 90;
 
-  ball_x = 430; 
-  ball_y = 160;
+  //starting coords of target slider 
+  //ball_x = 430; 
+  ball_x = start_grid_x;
+  //ball_y = 160;
+  ball_y = start_grid_y;
   
   nextButtonX = 3*width/4;
   nextButtonY = height-inchesToPixels(.2f);
@@ -99,11 +106,13 @@ void draw() {
   
   background(128);
   
+  // y-axis 
   stroke(255);
-  line(430,10,430,160);
+  line(start_grid_x, start_grid_y, start_grid_x, start_grid_y - grid_height);
 
+  // x-axis 
   stroke(255);
-  line(430,160,580,160);
+  line(start_grid_x, start_grid_y, start_grid_x + grid_width, start_grid_y);
 
   noStroke();
 
@@ -136,7 +145,8 @@ if (userDone)
   rotate(radians(screenRotation));
 
   fill(255, 0, 0); //set color to semi translucent
-  rect(0, 0, t.z + screenZ, t.z + screenZ);
+  float sizeMode = (t.z + screenZ) % maxZ;
+  rect(0, 0, sizeMode, sizeMode);
 
   popMatrix();
 
@@ -159,39 +169,22 @@ if (userDone)
 
 
   // target ellipse slider 
-  
-  if (t.z < maxZ)
-  {
-    value = maxZ - t.z;
 
-    // 1.44 == (216f / 150) 
-    // 150 == size of y bound (0 - 150)
-     posValue = value / (1.44);
-  }
 
-  // need to account for the condition where t.z > maxZ
-  // i.e target square is bigger than the gray square 
-
-  // if (t.z > maxZ)
-  // ... 
-  // ...
-
-  screenZ = ((160 - ball_y)*(1.44)) % maxZ;
+  // $$$ - commented out below
+  //screenZ = ((160 - ball_y)*(1.44)) % maxZ;
 
   // 430 is starting x spot of 
   // final_ball_x = 430 + (90 - (t.rotation % 90) * (1.6666666666666667));
-  final_ball_x = 430 + ((360 - t.rotation)  * (.4166666666666667));
+  //final_ball_x = 430 + ((360 - t.rotation)  * (.4166666666666667));
+  float needed_rotation =  (90 - t.rotation % 90)
+  final_ball_x = start_grid_x + needed_rotation;
 
-  // final_ball_x = 430 + 
+  //final_ball_y = 160 - int(posValue);
+  float needed_z = targettingZStart - t.z;
+  final_ball_y = start_grid_y - (needed_z);
 
-
-  final_ball_y = 160 - int(posValue);
-
-    // 1.44 == (216f / 150) 
-    // 150 == size of y bound (0 - 150)
-
-
-  fill(0, 255, 0);
+  fill(150, 255, 255);
   ellipse(final_ball_x, final_ball_y, final_size, final_size);
 
 
@@ -260,13 +253,15 @@ void mouseDragged()
     ball_y = mouseY;
 
     //rotates the target square accoringly
-    screenRotation = (430 - ball_x) * 1.6666666666666667;
-
-
-
-
+    // $$$
+    screenRotation = (start_grid_x - ball_x);
+    
+    
     //adjusts the size accordingly
-    screenZ = ((160 - ball_y)*(1.44)) % 216f;
+    // $$$
+    screenZ = ((start_grid_y - ball_y));
+    
+    println("********************* " + screenZ);
 
   
   }
@@ -333,10 +328,8 @@ void mouseReleased()
 
     //and move on to next trial
     trialIndex++;
-    ball_x = 430;
-    ball_y = 160;
-    value = 0;
-    posValue = 0;
+    ball_x = start_grid_x;
+    ball_y = start_grid_y;
 
 
     // hs1.reset();
@@ -407,113 +400,3 @@ double calculateDifferenceBetweenAngles(float a1, float a2)
  }
  
  
-class HScrollbar {
-  int swidth, sheight;    // width and height of bar
-  float xpos, ypos;       // x and y position of bar
-  float spos, newspos;    // x position of slider
-  float sposMin, sposMax; // max and min values of slider
-  int loose;              // how loose/heavy
-  boolean over;           // is the mouse over the slider?
-  boolean locked;
-  float ratio;
-
-  HScrollbar (float xp, float yp, int sw, int sh, int l) {
-    
-    swidth = sw;
-    sheight = sh;
-    
-    int widthtoheight = sw - sh;
-    ratio = (float)sw / (float)widthtoheight;
-    
-    xpos = xp;
-    ypos = yp-sheight/2;
-    
-    spos = xpos - (sw/2);
-    newspos = spos;
-        
-    sposMin = xpos - (sw/2);
-    sposMax = xpos+swidth/2;
-    loose = l;
-   
-  }
-
-  void update() {
-
-    Target t = targets.get(trialIndex);
-
-    if (overEvent()) {
-      over = true;
-    } else {
-      over = false;
-    }
-    if (mousePressed && over) {
-      locked = true;
-    }
-    if (!mousePressed) {
-      locked = false;
-    }
-    if (locked) {
-      newspos = constrain(mouseX-sheight/2, sposMin, sposMax);
-      screenZ += inchesToPixels(.02f);
-    }
-    if (abs(newspos - spos) > 1) {
-      spos = spos + (newspos-spos)/loose;
-    }
-    
-    screenRotation = (hs2.spos - ((xpos - (swidth/2)) * .3));
-
-    float slider_pos = hs1.spos - (xpos - (swidth/2));
-
-    float temp_ratio = (abs(maxZ - t.z) / swidth);
-
-    float temp = (hs1.spos - ((xpos - (swidth/2)) * (108f / swidth)));
-    float temp2 = (hs1.spos - ((xpos - (swidth/2)) * .02f));
-
-
-    float temp3 = slider_pos * temp_ratio;
-
-    screenZ = inchesToPixels(temp3);
-    screenZ %= 350;
-
-  }
-
-  void reset() 
-  {
-    spos = xpos - (swidth/2);
-    newspos = spos;
-  }
-
-  float constrain(float val, float minv, float maxv) {
-    return min(max(val, minv), maxv);
-  }
-
-  boolean overEvent() {
-    if (mouseX > xpos - (swidth/2) && mouseX < xpos+swidth/2 &&
-       mouseY > ypos && mouseY < ypos+sheight) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  void display() {
-    
-    noStroke();
-    fill(204);
-    rect(xpos, ypos, swidth, sheight);
-    
-    if (over || locked) {
-      fill(0, 0, 0);
-    } else {
-      fill(102, 102, 102);
-    }
-    
-    rect(spos, ypos, sheight, sheight);
-  }   
-
-  float getPos() {
-    // Convert spos to be values between
-    // 0 and the total width of the scrollbar
-    return spos * ratio;
-  }
-}
