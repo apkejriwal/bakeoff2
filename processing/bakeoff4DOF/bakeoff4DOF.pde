@@ -23,8 +23,8 @@ float screenRotation = 0; // change in rotation
 float targettingZStart = maxZ - 20; // starting size of targetting square
 float screenZ = 0; //change in size
 
-int trialCount = 8; //this will be set higher for the bakeoff
-//int trialCount = 50; //this will be set higher for the bakeoff
+//int trialCount = 8; //this will be set higher for the bakeoff
+int trialCount = 15; //this will be set higher for the bakeoff
 float border = 0; //have some padding from the sides
 int trialIndex = 0; //what trial are we on
 int errorCount = 0;  //used to keep track of errors
@@ -180,8 +180,8 @@ if (userDone)
   float needed_z = targettingZStart - t.z;
   final_ball_y = start_grid_y - (needed_z) * grid_scale;
   
-  //fill(255, 255, 255);
-  //ellipse(ball_x, ball_y, sliderClickRange*2, sliderClickRange*2);
+  fill(255, 255, 255);
+  ellipse(ball_x, ball_y, sliderClickRange*2, sliderClickRange*2);
 
   fill(255, 255, 0);
   ellipse(final_ball_x, final_ball_y, final_size, final_size);
