@@ -7,6 +7,7 @@ boolean draggingSlider = false;
 // nextButton variables are redfined in setup()
 float nextButtonX = 0;
 float nextButtonY = 0;
+float nextButtonSize = 0;
 
 int index = 0;
 
@@ -19,11 +20,11 @@ float screenTransY2 = 0;
 
 float screenRotation = 0; // change in rotation
 //float targettingZStart = 50f; // starting size of targetting square
-float targettingZStart = maxZ; // starting size of targetting square
+float targettingZStart = maxZ - 20; // starting size of targetting square
 float screenZ = 0; //change in size
 
-//int trialCount = 8; //this will be set higher for the bakeoff
-int trialCount = 50; //this will be set higher for the bakeoff
+int trialCount = 8; //this will be set higher for the bakeoff
+//int trialCount = 50; //this will be set higher for the bakeoff
 float border = 0; //have some padding from the sides
 int trialIndex = 0; //what trial are we on
 int errorCount = 0;  //used to keep track of errors
@@ -34,15 +35,17 @@ boolean userDone = false;
 
 float ball_x = 0;
 float ball_y = 0;
-float ball_size = 18;
+float ball_size = 7;
 
 float final_ball_x = 0;
 float final_ball_y = 0; 
-int final_size = 18;
+int final_size = 15;
 float start_grid_y;
 float start_grid_x;
 float grid_height;
 float grid_width;
+float grid_scale;
+float sliderClickRange = ball_size*2;
 
 final int screenPPI = 72; //what is the DPI of the screen you are using 
 
@@ -64,20 +67,21 @@ float inchesToPixels(float inch)
 void setup() {
   size(700, 700);
   noStroke();
-  
+    
   start_grid_y = height - 50;
   start_grid_x = 50;
   grid_height = maxZ;
   grid_width = 90;
+  grid_scale = 2;
 
   //starting coords of target slider 
-  //ball_x = 430; 
   ball_x = start_grid_x;
-  //ball_y = 160;
   ball_y = start_grid_y;
   
-  nextButtonX = 3*width/4;
-  nextButtonY = height-inchesToPixels(.2f);
+  nextButtonX = width/8;
+  nextButtonY = inchesToPixels(.2f) + 50;
+  nextButtonSize = inchesToPixels(2f);
+
 
   rectMode(CENTER);
   textFont(createFont("Arial", inchesToPixels(.2f))); //sets the font to Arial that is .3" tall
@@ -104,20 +108,20 @@ void setup() {
 
 void draw() {
   
-  background(128);
+  //background(128);
+  background(0, 0, 0);
+  
+  correctBackgroundChange();
   
   // y-axis 
   stroke(255);
-  line(start_grid_x, start_grid_y, start_grid_x, start_grid_y - grid_height);
+  line(start_grid_x, start_grid_y, start_grid_x, start_grid_y - grid_height*grid_scale);
 
   // x-axis 
   stroke(255);
-  line(start_grid_x, start_grid_y, start_grid_x + grid_width, start_grid_y);
+  line(start_grid_x, start_grid_y, start_grid_x + grid_width*grid_scale, start_grid_y);
 
   noStroke();
-
-  fill(0,255,0);
-  ellipse(ball_x,ball_y,ball_size,ball_size);
 
 
 
@@ -169,37 +173,37 @@ if (userDone)
 
 
   // target ellipse slider 
-
-
-  // $$$ - commented out below
-  //screenZ = ((160 - ball_y)*(1.44)) % maxZ;
-
-  // 430 is starting x spot of 
-  // final_ball_x = 430 + (90 - (t.rotation % 90) * (1.6666666666666667));
-  //final_ball_x = 430 + ((360 - t.rotation)  * (.4166666666666667));
-  float needed_rotation =  (90 - t.rotation % 90)
-  final_ball_x = start_grid_x + needed_rotation;
+  float needed_rotation =  (t.rotation % 90);
+  final_ball_x = start_grid_x + needed_rotation * grid_scale;
 
   //final_ball_y = 160 - int(posValue);
   float needed_z = targettingZStart - t.z;
-  final_ball_y = start_grid_y - (needed_z);
+  final_ball_y = start_grid_y - (needed_z) * grid_scale;
+  
+  //fill(255, 255, 255);
+  //ellipse(ball_x, ball_y, sliderClickRange*2, sliderClickRange*2);
 
-  fill(150, 255, 255);
+  fill(255, 255, 0);
   ellipse(final_ball_x, final_ball_y, final_size, final_size);
+ 
+  
+  fill(255,0,0);
+  ellipse(ball_x,ball_y,ball_size,ball_size);
 
 
   stroke(255);
-  line(430,final_ball_y,580,final_ball_y);
+  //line(430,final_ball_y,580,final_ball_y);
 
 
   stroke(255);
-  line(final_ball_x,10,final_ball_x,160);
+  //line(final_ball_x,10,final_ball_x,160);
 
   noStroke();
 
   // finish target ellipse slider 
 
-  scaffoldControlLogic(); //you are going to want to replace this!
+  int startTextX = 550;
+  float startTextY = 1.5f;
   
   text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, height - inchesToPixels(.5f));
   
@@ -208,7 +212,7 @@ if (userDone)
   }else{
     fill(255, 0, 0);
   }
-  text("X/Y Positioning: " + checkDistance() , 150, inchesToPixels(7.75f));
+  text("X/Y Positioning: " + checkDistance() , startTextX, inchesToPixels(startTextY));
   
   
   if(checkRotation()){
@@ -217,23 +221,42 @@ if (userDone)
     fill(255, 0, 0);
   }
 
-  text("Rotation: " + checkRotation() , 150 + inchesToPixels(.2f), inchesToPixels(7.5f));
+  text("Rotation: " + checkRotation() , startTextX + inchesToPixels(.2f), inchesToPixels(startTextY + 0.25f));
   
   if(checkZ()){
     fill(0, 255, 0);
   }else{
     fill(255, 0, 0);
   }
-  text("Size: " + checkZ() , 150 + inchesToPixels(.2f), inchesToPixels(8f));
+  text("Size: " + checkZ() , startTextX + inchesToPixels(.2f), inchesToPixels(startTextY + 0.5f));
+  
+  
+  
+  drawNextButton(); //you are going to want to replace this!
   
   
 }
 
 //my example design
-void scaffoldControlLogic()
+void correctBackgroundChange(){
+  if (trialIndex != trialCount){
+    //ellipse(nextButtonX, nextButtonY, nextButtonSize, nextButtonSize);
+    if (checkDistance() & checkRotation() & checkZ()){
+      background(255, 255, 0);
+    }
+  }
+}
+
+//my example design
+void drawNextButton()
 {
 
+  textSize(50); 
+  //ellipse(nextButtonX, nextButtonY, nextButtonSize, nextButtonSize);
+  fill(0, 0, 255);
   text("Next", nextButtonX, nextButtonY);
+  fill(255, 0, 0);
+  textSize(15); 
   
 }
 
@@ -248,18 +271,18 @@ void mouseDragged()
     screenTransY = mouseY - t.y - height/2;
   }
 
-  if (draggingSlider){
+  if (draggingSlider & !draggingSquare){
     ball_x = mouseX;
     ball_y = mouseY;
 
     //rotates the target square accoringly
     // $$$
-    screenRotation = (start_grid_x - ball_x);
+    screenRotation = (start_grid_x - ball_x) / grid_scale;
     
     
     //adjusts the size accordingly
     // $$$
-    screenZ = ((start_grid_y - ball_y));
+    screenZ = ((start_grid_y - ball_y)) / grid_scale;
     
     println("********************* " + screenZ);
 
@@ -294,8 +317,8 @@ void mousePressed()
     println((90 - (t.rotation % 90)));
     println("final ball val");
     // println(430 + (90 - (t.rotation % 90) * (.4166666666666667));
-
-    if (mouseX >= ball_x - ball_size / 2 && mouseX <= ball_x + ball_size / 2 && (mouseY >= ball_y - ball_size / 2 && mouseY <= ball_y + ball_size / 2))
+    
+    if (mouseX >= ball_x - sliderClickRange && mouseX <= ball_x + sliderClickRange && (mouseY >= ball_y - sliderClickRange && mouseY <= ball_y + sliderClickRange))
     {
       draggingSlider = true;
       print(90 - (t.rotation % 90));
@@ -313,7 +336,7 @@ void mouseReleased()
     screenTransY = mouseY - t.y - height/2;
   }
 
-  if (draggingSlider){
+  if (draggingSlider & !draggingSquare){
     draggingSlider = false;
     ball_x = mouseX;
     ball_y = mouseY;
@@ -321,13 +344,12 @@ void mouseReleased()
   }
   
   //check to see if user clicked near Next Button (if so then advance to next random square)
-  if (dist(nextButtonX, nextButtonY, mouseX, mouseY)<inchesToPixels(.5f))
+  if (dist(nextButtonX, nextButtonY, mouseX, mouseY)< nextButtonSize)
   {
     if (userDone==false && !checkForSuccess())
       errorCount++;
 
-    //and move on to next trial
-    trialIndex++;
+   
     ball_x = start_grid_x;
     ball_y = start_grid_y;
 
@@ -336,10 +358,16 @@ void mouseReleased()
     // hs2.reset();
 
 
-    if (trialIndex==trialCount && userDone==false)
+    if (trialIndex==trialCount-1 && userDone==false)
     {
       userDone = true;
       finishTime = millis();
+    }
+    
+    //and move on to next trial
+    if (trialIndex!=trialCount && userDone==false)
+    {
+      trialIndex++;
     }
   }
   
@@ -366,7 +394,7 @@ public boolean checkZ()
 {
   Target t = targets.get(trialIndex);  
   //boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f);
-  boolean closeZ = abs((t.z + screenZ) - targettingZStart)<inchesToPixels(.05f);
+  boolean closeZ = abs((t.z + screenZ)%maxZ - targettingZStart)<inchesToPixels(.05f);
   return closeZ;
 }
 
